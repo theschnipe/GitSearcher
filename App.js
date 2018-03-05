@@ -3,14 +3,20 @@ import {connect} from 'react-redux';
 import logo from '/logo.svg';
 import './App.css';
 
+ReactDOM.render(
+  <Provider store={store}>
+  <App />
+  </Provider>, document.getElementById('root'));
+
+
 class App extends Component {
     onHandleChange = (e) => {
-    let {dispatch} = this.prop;
+    var {dispatch} = this.props;
     dispatch({type: 'UPDATE_USERNAME', username: e.target.value})
 }
 onUserSearch = () => {
-    let {dispatch} = this.prop;
-    let {username} = this.prop;
+    var {dispatch} = this.props;
+    var {username} = this.props;
 
     fetch(`https://api.github.com/users/${username}`)
     .then(git => {
@@ -23,12 +29,12 @@ onUserSearch = () => {
 }
  
 onRepoFetch = () => {
-    let {dispatch} = this.prop;
-    let {repos_url} = this.prop.usergit;
+    var {dispatch} = this.props;
+    var {repos_url} = this.props.usergit;
 
     fetch(repos_url)
     .then (res => {
-
+      return res.json()
     })
     .then(res => {
         dispatch({type: 'UPDATE_REPO', repo: res })
@@ -36,19 +42,19 @@ onRepoFetch = () => {
 }
 
 render() {
-    let {usergit} = this.prop;
-    let repo = this.props.repo.map(repo, i) => {
+    var {usergit} = this.props;
+    var repo = this.props.repos.map((repo, i) => {
         return <li key={i}>{repo.name}></li>
-    }
+    })
         return (
             <div>
                 Search for your Repos!
                 <input type="text" 
                         onChange={this.onHandleChange}
-                        value={this.prop.user} />
+                        value={this.props.user} />
                         <button onClick = {this.onUserSearch}>search</button>
                         <hr/>
-                        <h3>{this.prop.usergit.login}</h3>
+                        <h3>{this.props.usergit.login}</h3>
                         <img src={usergit.avatar_url} alt=""/>
                         <button onClick={this.onRepoFetch}>Fetch Repos </button>
                 {repo}
@@ -57,7 +63,7 @@ render() {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToprops = (state) => {
     return {
         username: state.username,
         usergit: state.usergit,
